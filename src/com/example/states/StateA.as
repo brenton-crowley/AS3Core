@@ -7,7 +7,7 @@
  */
 package com.example.states {
 
-    import au.com.brentoncrowley.state.states.AbstractState;
+    import au.com.brentoncrowley.managers.state.states.AbstractState;
 
     import com.example.transitions.RevealStateBTransition;
 

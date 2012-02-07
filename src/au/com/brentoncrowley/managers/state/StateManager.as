@@ -5,10 +5,10 @@
  * Time: 10:03
  * To change this template use File | Settings | File Templates.
  */
-package au.com.brentoncrowley.state {
+package au.com.brentoncrowley.managers.state {
 
     import au.com.brentoncrowley.interfaces.IState;
-    import au.com.brentoncrowley.state.states.TransitionState;
+    import au.com.brentoncrowley.managers.state.states.TransitionState;
 
     import flash.utils.Dictionary;
 
@@ -50,7 +50,7 @@ package au.com.brentoncrowley.state {
             registeredStates = new Dictionary();
         }
 
-        public function setDefaultState(defaultStateID:String = null):void {
+        public function setDefaultState(defaultStateID:String):void {
             registerState(new TransitionState(TRANSITION_STATE));
             _state = getRegisteredState(defaultStateID);
 

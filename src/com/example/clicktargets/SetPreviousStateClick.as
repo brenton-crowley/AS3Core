@@ -8,7 +8,7 @@
 package com.example.clicktargets {
 
     import au.com.brentoncrowley.interfaces.IClickTarget;
-    import au.com.brentoncrowley.state.StateManager;
+    import au.com.brentoncrowley.managers.state.StateManager;
 
     public class SetPreviousStateClick implements IClickTarget {
 

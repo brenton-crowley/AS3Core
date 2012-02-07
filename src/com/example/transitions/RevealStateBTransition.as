@@ -7,7 +7,7 @@
  */
 package com.example.transitions {
 
-    import au.com.brentoncrowley.state.transitions.AbstractStateTransition;
+    import au.com.brentoncrowley.managers.state.transitions.AbstractStateTransition;
 
     import com.greensock.TweenLite;
 

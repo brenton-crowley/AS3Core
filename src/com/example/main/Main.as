@@ -8,7 +8,8 @@
 package com.example.main {
 
     import au.com.brentoncrowley.interfaces.IClickTarget;
-    import au.com.brentoncrowley.state.StateManager;
+    import au.com.brentoncrowley.managers.commands.CommandManager;
+    import au.com.brentoncrowley.managers.state.StateManager;
     import au.com.brentoncrowley.ui.buttons.ClickTargetButton;
     import au.com.brentoncrowley.ui.display.AbstractMain;
 

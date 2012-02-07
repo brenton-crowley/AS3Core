@@ -5,12 +5,12 @@
  * Time: 10:12
  * To change this template use File | Settings | File Templates.
  */
-package au.com.brentoncrowley.state.states {
+package au.com.brentoncrowley.managers.state.states {
 
     import au.com.brentoncrowley.interfaces.IState;
     import au.com.brentoncrowley.interfaces.ITransition;
-    import au.com.brentoncrowley.state.StateManager;
-    import au.com.brentoncrowley.state.transitions.AbstractStateTransition;
+    import au.com.brentoncrowley.managers.state.StateManager;
+    import au.com.brentoncrowley.managers.state.transitions.AbstractStateTransition;
 
     import flash.utils.Dictionary;
     import flash.utils.getDefinitionByName;

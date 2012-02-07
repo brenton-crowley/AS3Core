@@ -5,7 +5,7 @@
  * Time: 10:25
  * To change this template use File | Settings | File Templates.
  */
-package au.com.brentoncrowley.state.transitions {
+package au.com.brentoncrowley.managers.state.transitions {
 
     import au.com.brentoncrowley.interfaces.ITransition;
 

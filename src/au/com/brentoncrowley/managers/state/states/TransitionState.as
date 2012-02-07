@@ -5,7 +5,7 @@
  * Time: 17:13
  * To change this template use File | Settings | File Templates.
  */
-package au.com.brentoncrowley.state.states {
+package au.com.brentoncrowley.managers.state.states {
 
     public class TransitionState extends AbstractState {
 

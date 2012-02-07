@@ -7,7 +7,7 @@
  */
 package com.example.states {
 
-    import au.com.brentoncrowley.state.transitions.AbstractStateTransition;
+    import au.com.brentoncrowley.managers.state.transitions.AbstractStateTransition;
 
     public class HideStateDTransition extends AbstractStateTransition {
 

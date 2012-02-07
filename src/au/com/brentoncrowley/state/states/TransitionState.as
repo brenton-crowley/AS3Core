@@ -9,8 +9,8 @@ package au.com.brentoncrowley.state.states {
 
     public class TransitionState extends AbstractState {
 
-        public function TransitionState() {
-            super();
+        public function TransitionState(id:String) {
+            super(id);
         }
     }
 }

@@ -11,61 +11,57 @@ package au.com.brentoncrowley.state.states {
     import au.com.brentoncrowley.interfaces.ITransition;
     import au.com.brentoncrowley.state.StateManager;
     import au.com.brentoncrowley.state.transitions.AbstractStateTransition;
-    import au.com.brentoncrowley.state.transitions.InstantStateTransition;
 
     import flash.utils.Dictionary;
     import flash.utils.getDefinitionByName;
-    import flash.utils.getQualifiedClassName;
     import flash.utils.getQualifiedSuperclassName;
 
     public class AbstractState implements IState {
 
+        protected var _id:String;
         protected var inTransition:ITransition;
         protected var outTransition:ITransition;
         protected var transition:ITransition;
-        protected var stateManager:StateManager;
         protected var inTransitions:Dictionary;
         protected var outTransitions:Dictionary;
 
-        public function AbstractState() {
+        public function AbstractState(id:String = null) {
+            if(id == null) throw new Error("********************* ERROR CREATING STATE ******************* an id must be supplied");
+            _id = id;
             inTransitions = new Dictionary();
             inTransitions.name = "inTransitions";
             outTransitions = new Dictionary();
             outTransitions.name = "outTransitions";
-            stateManager = StateManager.instance;
 
             defineTransitions();
         }
 
-        protected function defineTransitions():void {
-//            addInTransitions();
-//            addOutTransitions();
-        }
+        // override
+        protected function defineTransitions():void {}
 
-        protected function addStateTransitionTo(targetState:Class, outTransition:AbstractStateTransition,  inTransition:AbstractStateTransition):void {
+        protected function addStateTransitionTo(targetStateID:String, outTransition:AbstractStateTransition,  inTransition:AbstractStateTransition):void {
 //            trace(this, "(targetState is getClassName(this):",(targetState == getClassName(this)), targetState, getClassName(this));
-            if((targetState == getClassName(this))) throw new Error("*** INVALID TRANSITION IN *** " + this + " REASON: Cannot transition to itself. The state provided in the targetState parameter is most likely equal to this state. THIS: " + getClassName(this) + " TARGET: " + targetState);
-            addOutTransitionTo(targetState, outTransition);
-            addInTransitionTo(targetState, inTransition);
+            if((targetStateID == _id)) throw new Error("*** INVALID TRANSITION IN *** " + this + " REASON: Cannot transition to itself. The state provided in the targetState parameter is most likely equal to this state. THIS: " + id + " TARGET: " + targetStateID);
+            addOutTransitionTo(targetStateID, outTransition);
+            addInTransitionTo(targetStateID, inTransition);
         }
 
-        private function addInTransitionTo(targetState:Class, transition:AbstractStateTransition):void {
-            addTransition(this.inTransitions, targetState, transition);
+        private function addInTransitionTo(targetStateID:String, transition:AbstractStateTransition):void {
+            addTransition(inTransitions, targetStateID, transition);
         }
 
-        private function addOutTransitionTo(targetState:Class, transition:AbstractStateTransition):void {
-            addTransition(this.outTransitions, targetState, transition);
+        private function addOutTransitionTo(targetStateID:String, transition:AbstractStateTransition):void {
+            addTransition(outTransitions, targetStateID, transition);
         }
 
-        private function addTransition(transitions:Dictionary, state:Class, transition:AbstractStateTransition):void {
-            var superStateClass:Class = Class(getDefinitionByName(getQualifiedSuperclassName(state)));
+        private function addTransition(transitions:Dictionary, stateID:String, transition:AbstractStateTransition):void {
             var superTransitionClass:Class = Class(getDefinitionByName(getQualifiedSuperclassName(transition)));
             //TODO Create a validate method that recursively loops to the desired super class
-            if ((superStateClass != AbstractState) && (superTransitionClass != AbstractStateTransition)) {
-                throw new Error(state + " Must extend " + superStateClass + " AND " + transition + " must extend " + superTransitionClass);
+            if ((superTransitionClass != AbstractStateTransition)) {
+                throw new Error(transition + " must extend " + superTransitionClass);
             } else {
-                if (!transitions[state]) {
-                    transitions[state] = transition;
+                if (!transitions[stateID]) {
+                    transitions[stateID] = transition;
                     //trace(this, "[ADD TRANSITION]", "When targetState is:", state, "transition:", transition, " extends:", getDefinitionByName(getQualifiedSuperclassName(state)));
                 } else {
                     throw new Error(this + " " + transitions.name + " Already Contains a transition on this state - TRANSITION: " + transition);
@@ -75,16 +71,8 @@ package au.com.brentoncrowley.state.states {
 
         private function onStateTransitionSignalUpdate(updateType:String):void {
             switch (updateType) {
-                case AbstractStateTransition.ON_STATE_TRANSITION_START:
-                    break;
-                case AbstractStateTransition.ON_STATE_TRANSITION_PAUSE:
-                    break;
-                case AbstractStateTransition.ON_STATE_TRANSITION_STOP:
-                    break;
                 case AbstractStateTransition.ON_STATE_TRANSITION_COMPLETE:
-
                     updateTransition();
-
                     break;
                 default:
             }
@@ -96,7 +84,7 @@ package au.com.brentoncrowley.state.states {
 //						trace(this, "updateTransion: OUT", this.outTransition, this.transition, (this.outTransition == this.transition));
                     this.outTransition = removeTransition();
                     //transitionTargetStateIn();
-                    this.stateManager.transitionTargetStateIn();
+                    StateManager.instance.transitionTargetStateIn();
                     break;
                 case this.inTransition:
 //						trace(this, "updateTransion: IN", this.inTransition, this.transition, (this.inTransition == this.transition));
@@ -113,7 +101,7 @@ package au.com.brentoncrowley.state.states {
 
         public function transitionCurrentStateOut():void {
 //			trace(this, "transitionPreviousStateOut to targetState");
-            this.transition = getOutTransition(this.stateManager.targetState);
+            this.transition = getOutTransition(StateManager.instance.targetState);
             initTransition();
             this.outTransition = this.transition;
             this.transition.startTransition();
@@ -121,7 +109,7 @@ package au.com.brentoncrowley.state.states {
 
         public function transitionTargetStateIn():void {
 //			trace(this, "transitionTargetStateIn from previousState:", this.stateManager.previousState);
-            this.transition = getInTransition(this.stateManager.targetState);
+            this.transition = getInTransition(StateManager.instance.targetState);
             initTransition();
             this.inTransition = this.transition;
             this.transition.startTransition();
@@ -137,7 +125,7 @@ package au.com.brentoncrowley.state.states {
 
 
         public function completeStateChange():void {
-            stateManager.completeStateChange();
+            StateManager.instance.completeStateChange();
         }
 
         private function initTransition():void {
@@ -151,24 +139,15 @@ package au.com.brentoncrowley.state.states {
             return null;
         }
 
-
-        protected function getClassName(state:IState):Class {
-            return Class(getDefinitionByName(getQualifiedClassName(state)));
-        }
+//
+//        protected function getClassName(state:IState):Class {
+//            return Class(getDefinitionByName(getQualifiedClassName(state)));
+//        }
 
         private function lookUpTransition(transitions:Dictionary, state:IState):ITransition {
-            var transition:ITransition = ITransition(transitions[getClassName(state)]);
-            if (transition) {
-                return transition;
-            } else {
-
-//                trace("---> *** WARNING *** <---" + this + " Could not find " + getClassName(state) + " in [this." + transitions.name + "] instance. Check to see if the transition was defined in the 'definedTransitions()' method of " + this);
-//                trace("---> " + InstantStateTransition + "was used in place and has been set");
-//                transition = new InstantStateTransition();
-//                transitions[getClassName(state)] = transition;
-                return null;
-            }
-
+            var transition:ITransition = ITransition(transitions[state.id]);
+            if (transition) return transition;
+            return null;
         }
 
         public function hasValidTransition(targetState:IState):Boolean {
@@ -186,9 +165,13 @@ package au.com.brentoncrowley.state.states {
             if(!hasValidOutTransition) message += "---------- > [NO OUT TRANSITION]: You must define an OUT transition for " + this + " in " + this + "\r";
             if(!hasValidInTransition) message += "---------- > [NO IN TRANSITION]: You must define an IN transition for " + targetState + " in " + this + "\r";
 
-            message += "---------- > [EXAMPLE]: addStateTransitionTo(" + String(getClassName(targetState)).substring(String(getClassName(targetState)).indexOf(" ") + 1, String(getClassName(targetState)).lastIndexOf("]"))  + ", new defineOutTransition(), new defineInTransition()); \r";
+            message += "---------- > [EXAMPLE]: addStateTransitionTo(" +targetState.id + ", new defineOutTransition(), new defineInTransition()); \r";
             message += "---------- > This should be placed in " + this + " inside the overridden 'defineTransition() method'\r";
             return message;
+        }
+
+        public function get id():String {
+            return _id;
         }
     }
 

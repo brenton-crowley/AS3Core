@@ -12,16 +12,14 @@ package com.example.clicktargets {
 
     public class SetStateClickTarget implements IClickTarget{
         
-        private var targetState:Class;
+        private var targetState:String;
 
-        public function SetStateClickTarget(targetState:Class) {
-            this.targetState = targetState;
+        public function SetStateClickTarget(targetStateID:String) {
+            this.targetState = targetStateID;
         }
 
         public function executeClick():void {
-
-            StateManager.instance.setTargetState(this.targetState);
-
+            StateManager.instance.setTargetState(targetState);
         }
     }
 }

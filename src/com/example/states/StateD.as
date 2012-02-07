@@ -13,13 +13,13 @@ package com.example.states {
 
     public class StateD extends AbstractState {
 
-        public function StateD() {
-            super();
+        public function StateD(id:String) {
+            super(id);
         }
 
         override protected function defineTransitions():void {
-            addStateTransitionTo(StateB, new HideStateDTransition(), new RevealStateBTransition());
-            addStateTransitionTo(StateE, new HideStateDTransition(), new RevealStateETransition());
+            addStateTransitionTo(States.STATE_B, new HideStateDTransition(), new RevealStateBTransition());
+            addStateTransitionTo(States.STATE_E, new HideStateDTransition(), new RevealStateETransition());
         }
     }
 }

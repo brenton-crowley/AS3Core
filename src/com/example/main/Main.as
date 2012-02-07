@@ -21,6 +21,7 @@ package com.example.main {
     import com.example.states.StateD;
     import com.example.states.StateE;
     import com.example.states.StateF;
+    import com.example.states.States;
 
     import flash.text.TextField;
 
@@ -50,13 +51,14 @@ package com.example.main {
 
         private function initStates():void {
             StateManager.instance.signal.add(onStateManagerSignalUpdate);
-            StateManager.instance.registerState(new StateA());
-            StateManager.instance.registerState(new StateB());
-            StateManager.instance.registerState(new StateC());
-            StateManager.instance.registerState(new StateD());
-            StateManager.instance.registerState(new StateE());
-            StateManager.instance.registerState(new StateF());
-            StateManager.instance.setDefaultState(StateA);
+            StateManager.instance.registerState(new StateA(States.STATE_A));
+            StateManager.instance.registerState(new StateB(States.STATE_B));
+            StateManager.instance.registerState(new StateC(States.STATE_C));
+            StateManager.instance.registerState(new StateD(States.STATE_D));
+            StateManager.instance.registerState(new StateE(States.STATE_E));
+            StateManager.instance.registerState(new StateF(States.STATE_F));
+            StateManager.instance.setDefaultState(States.STATE_A);
+
         }
 
         private function onStateManagerSignalUpdate(updateType:String):void {
@@ -71,18 +73,19 @@ package com.example.main {
         }
 
         private function updateField():void {
-            this.outputField.text = String(StateManager.instance.currentState);
+            this.outputField.text = StateManager.instance.state.id;
         }
 
         private function initButtons():void {
 
-            initButton(stateAButton, new SetStateClickTarget(StateA));
-            initButton(stateBButton, new SetStateClickTarget(StateB));
-            initButton(stateCButton, new SetStateClickTarget(StateC));
-            initButton(stateDButton, new SetStateClickTarget(StateD));
-            initButton(stateEButton, new SetStateClickTarget(StateE));
-            initButton(stateFButton, new SetStateClickTarget(StateF));
+            initButton(stateAButton, new SetStateClickTarget(States.STATE_A));
+            initButton(stateBButton, new SetStateClickTarget(States.STATE_B));
+            initButton(stateCButton, new SetStateClickTarget(States.STATE_C));
+            initButton(stateDButton, new SetStateClickTarget(States.STATE_D));
+            initButton(stateEButton, new SetStateClickTarget(States.STATE_E));
+            initButton(stateFButton, new SetStateClickTarget(States.STATE_F));
             initButton(backButton,   new SetPreviousStateClick());
+
 
         }
 

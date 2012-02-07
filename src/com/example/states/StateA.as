@@ -8,18 +8,17 @@
 package com.example.states {
 
     import au.com.brentoncrowley.state.states.AbstractState;
-    import au.com.brentoncrowley.state.states.DefaultState;
 
     import com.example.transitions.RevealStateBTransition;
 
     public class StateA extends AbstractState {
 
-        public function StateA() {
-            super();
+        public function StateA(id:String) {
+            super(id);
         }
 
         override protected function defineTransitions():void {
-            addStateTransitionTo(StateB, new HideStateATransition(), new RevealStateBTransition());
+            addStateTransitionTo(States.STATE_B, new HideStateATransition(), new RevealStateBTransition());
         }
 
 

@@ -11,12 +11,12 @@ package com.example.states {
 
     public class StateC extends AbstractState {
 
-        public function StateC() {
-            super();
+        public function StateC(id:String) {
+            super(id);
         }
 
         override protected function defineTransitions():void {
-            addStateTransitionTo(StateD, new HideStateCTransition(), new RevealStateDTransition());
+            addStateTransitionTo(States.STATE_D, new HideStateCTransition(), new RevealStateDTransition());
         }
     }
 }

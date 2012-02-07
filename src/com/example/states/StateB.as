@@ -10,14 +10,14 @@ package com.example.states {
     import au.com.brentoncrowley.state.states.AbstractState;
 
     public class StateB extends AbstractState {
-        public function StateB() {
-            super();
+        public function StateB(id:String) {
+            super(id);
         }
 
 
         override protected function defineTransitions():void {
-            addStateTransitionTo(StateA, new HideStateBTransition(), new RevealStateATransition());
-            addStateTransitionTo(StateC, new HideStateBTransition(), new RevealStateCTransition());
+            addStateTransitionTo(States.STATE_A, new HideStateBTransition(), new RevealStateATransition());
+            addStateTransitionTo(States.STATE_C, new HideStateBTransition(), new RevealStateCTransition());
         }
     }
 }

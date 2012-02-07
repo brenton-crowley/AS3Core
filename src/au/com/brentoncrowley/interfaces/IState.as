@@ -10,14 +10,11 @@ package au.com.brentoncrowley.interfaces {
     public interface IState {
 
         function startStateChange():void;
-
         function transitionCurrentStateOut():void;
-
         function transitionTargetStateIn():void;
-
         function completeStateChange():void;
-
         function hasValidTransition(targetState:IState):Boolean;
+        function get id():String;
 
     }
 }

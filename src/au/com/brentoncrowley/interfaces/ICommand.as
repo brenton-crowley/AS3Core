@@ -11,7 +11,7 @@ package au.com.brentoncrowley.interfaces {
 
         function execute():void;
         function undo():void;
-        function id():String;
+        function get id():String;
 
     }
 }

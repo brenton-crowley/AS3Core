@@ -21,8 +21,8 @@ package au.com.brentoncrowley.managers.commands.cmds {
 
         public function undo():void {}
 
-        public function id():String {
-            return getDefinitionByName(getQualifiedClassName(this)).toString();
+        public function get id():String {
+            return String(getDefinitionByName(getQualifiedClassName(this)));
         }
     }
 }

@@ -7,12 +7,19 @@
  */
 package au.com.brentoncrowley.managers.commands.data {
 
+    import au.com.brentoncrowley.interfaces.ICommand;
+    import au.com.brentoncrowley.interfaces.ICommandObject;
+    import au.com.brentoncrowley.managers.commands.cmds.NoCommand;
+
     public class CommandSlotData {
 
         private var _commandData:CommandData;
+        private var _object:ICommandObject;
 //        private var _commandHistory:Vector.<CommandData>;
 
-        public function CommandSlotData() {
+        public function CommandSlotData(object:ICommandObject, defaultCommandData:CommandData = null) {
+            _object = object;
+            _commandData = defaultCommandData ? defaultCommandData : new CommandData(new NoCommand());
 //            _commandHistory = new Vector.<CommandData>();
         }
 
@@ -33,5 +40,19 @@ package au.com.brentoncrowley.managers.commands.data {
 //        public function get commandHistory():Vector.<CommandData> {
 //            return _commandHistory;
 //        }
+        public function dispose():void {
+            if(commandData){
+                commandData.dispose();
+                commandData = null;
+            }
+
+            if(_object){
+                _object = null;
+            }
+        }
+
+        public function get object():ICommandObject {
+            return _object;
+        }
     }
 }

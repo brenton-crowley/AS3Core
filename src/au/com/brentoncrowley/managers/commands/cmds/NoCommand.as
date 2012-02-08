@@ -7,17 +7,10 @@
  */
 package au.com.brentoncrowley.managers.commands.cmds {
 
-    import au.com.brentoncrowley.interfaces.ICommand;
-
-    public class NoCommand implements ICommand{
+    public class NoCommand extends AbstractCommand{
 
         public function NoCommand() {
         }
 
-        public function execute():void {
-        }
-
-        public function undo():void {
-        }
     }
 }

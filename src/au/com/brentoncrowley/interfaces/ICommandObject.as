@@ -8,5 +8,10 @@
 package au.com.brentoncrowley.interfaces {
 
     public interface ICommandObject {
+
+        function registerWithCommandCentre():void;
+        function unregisterWithCommandCentre():void;
+        function onCommandManagerSignalUpdate(updateType:String, object:ICommandObject = null):void;
+
     }
 }

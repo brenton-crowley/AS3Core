@@ -34,7 +34,7 @@ package au.com.brentoncrowley.managers.commands.data {
         }
 
         public function get id():String {
-            return command.id();
+            return command.id;
         }
 
         public function get nextCommandData():CommandData {
@@ -47,6 +47,13 @@ package au.com.brentoncrowley.managers.commands.data {
 
         public function get previousCommandData():CommandData {
             return _previousCommandData;
+        }
+
+        public function dispose():void {
+            _command = null;
+            if(_nextCommandData) _nextCommandData.dispose();
+            if(_previousCommandData) _previousCommandData.dispose();
+            if(_previousCommand) _previousCommand = null;
         }
     }
 }

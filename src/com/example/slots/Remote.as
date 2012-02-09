@@ -14,7 +14,7 @@ package com.example.slots {
 
     import com.example.clicktargets.RemoteButtonClick;
     import com.example.clicktargets.UndoClick;
-    import com.example.commands.GlobalUndoCommand;
+    import au.com.brentoncrowley.managers.commands.cmds.GlobalUndoCommand;
     import com.example.commands.MasterOffCommand;
     import com.example.commands.MasterOnCommand;
     import com.example.commands.TurnOffCommand;

@@ -40,8 +40,6 @@ package com.example.commands {
             clearObjectButton.visible = false;
         }
 
-
-
         private function initButton(button:ClickTargetButton, clickTarget:IClickTarget):void {
             button.clickTarget = clickTarget;
             button.initButton();

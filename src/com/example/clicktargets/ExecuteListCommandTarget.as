@@ -23,7 +23,7 @@ package com.example.clicktargets {
 
 
         public function executeClick():void {
-            CommandManager.instance.executeListCommand(_commandList);
+            _commandList.executeNextCommand();
         }
     }
 }

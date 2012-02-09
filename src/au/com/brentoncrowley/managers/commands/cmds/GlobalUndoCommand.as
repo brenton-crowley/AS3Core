@@ -5,7 +5,7 @@
  * Time: 15:37
  * To change this template use File | Settings | File Templates.
  */
-package com.example.commands {
+package au.com.brentoncrowley.managers.commands.cmds {
 
     import au.com.brentoncrowley.managers.commands.CommandManager;
     import au.com.brentoncrowley.managers.commands.cmds.AbstractCommand;

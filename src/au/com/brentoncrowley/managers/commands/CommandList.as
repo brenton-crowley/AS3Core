@@ -12,6 +12,12 @@ package au.com.brentoncrowley.managers.commands {
 
     import org.osflash.signals.Signal;
 
+    /**
+     * A class that arbitrates communication between the CommandManager and the associated object that created the CommandList.s
+     *
+     * @author Brenton Crowley, brenton.crowley@gmail.com
+     */
+
     public class CommandList implements ICommandObject {
 
         public const ON_MAX_UNDO:String = "onMaxUndo";
@@ -21,9 +27,12 @@ package au.com.brentoncrowley.managers.commands {
 
         private var _commandSequence:Array;
 
-        public function CommandList() {
+        public function CommandList(commandSequence:Array = null) {
+            _commandSequence = commandSequence;
             signal = new Signal(String);
-            registerWithCommandCentre();
+
+            if(_commandSequence) registerWithCommandCentre();
+            
         }
 
         public function onCommandManagerSignalUpdate(updateType:String, object:ICommandObject = null):void {
@@ -42,10 +51,16 @@ package au.com.brentoncrowley.managers.commands {
             }
         }
 
-
+        /**
+         * Sets the command list that will be used to execute the sequence.
+         *
+         *
+         */
         public function registerWithCommandCentre():void {
+            if(!_commandSequence) throw new Error("The CommandList must contain a commandSequence before it can be registered. Please supply a list first.");
             CommandManager.instance.signal.add(onCommandManagerSignalUpdate);
             CommandManager.instance.registerList(this, _commandSequence);
+
         }
 
         public function withdrawFromCommandCentre():void {
@@ -53,12 +68,34 @@ package au.com.brentoncrowley.managers.commands {
             CommandManager.instance.withdrawList(this);
         }
 
+        public function undoCurrentCommand():void {
+            CommandManager.instance.undoListCommand(this);
+        }
+
+        public function executeNextCommand():void {
+            CommandManager.instance.executeListCommand(this);
+        }
+
         public function get commandSequence():Array {
             return _commandSequence;
         }
 
-        public function set commandSequence(value:Array):void {
-            _commandSequence = value;
+        /**
+         * Sets the command list that will be used to execute the sequence.
+         *
+         * Exmaple:
+         *
+         * var commandSequence:Array = [
+         *      new FirstCommand(),
+         *      new SecondCommand(),
+         *      new ThirdCommand(),
+         *      new FourthCommand()
+         * ];
+         *
+         *  @param commandSequence The object that will be withdrawn.
+         */
+        public function set commandSequence(commandSequence:Array):void {
+            _commandSequence = commandSequence;
         }
 
         public function startSequence():void {

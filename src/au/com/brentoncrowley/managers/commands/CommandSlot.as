@@ -13,13 +13,11 @@ package au.com.brentoncrowley.managers.commands {
 
     public class CommandSlot implements ICommandObject {
 
-        private var undoHistory:Array;
         private var _command:ICommand;
 
         public function CommandSlot() {
-            undoHistory = [];
-           CommandManager.instance.signal.add(onCommandManagerSignalUpdate);
-            CommandManager.instance.registerSlot(this);
+
+            registerWithCommandCentre();
         }
 
         public function onCommandManagerSignalUpdate(updateType:String, object:ICommandObject = null):void {
@@ -29,13 +27,14 @@ package au.com.brentoncrowley.managers.commands {
             }
         }
 
-
         public function registerWithCommandCentre():void {
+            CommandManager.instance.signal.add(onCommandManagerSignalUpdate);
             CommandManager.instance.registerSlot(this);
         }
 
-        public function unregisterWithCommandCentre():void {
-            CommandManager.instance.unregisterSlot(this);
+        public function withdrawFromCommandCentre():void {
+            CommandManager.instance.signal.remove(onCommandManagerSignalUpdate);
+            CommandManager.instance.withdrawSlot(this);
         }
 
         public function setCommand(command:ICommand):void {
@@ -44,30 +43,16 @@ package au.com.brentoncrowley.managers.commands {
         }
 
         public function execute():void {
-            updateHistory();
             CommandManager.instance.executeSlotCommand(this);
         }
 
-        private function updateHistory():void {
-            undoHistory.unshift(_command);
-//            trace(this, "UNDO HISTORY", undoHistory);
-        }
-
         public function undo():void {
-            var undoCommand:ICommand = getUndoCommand();
-            setCommand(undoCommand);
-//            trace(this, "UNDO:", undoCommand, "HISTORY:", undoHistory);
             CommandManager.instance.undoSlotCommand(this);
         }
 
-        private function getUndoCommand():ICommand {
-            var command:ICommand = undoHistory.shift();
-            command = command ? command : new NoCommand();
-            return command;
-        }
-
-        public function get id():String {
-            return "";
+        public function dispose():void {
+            _command = null;
+            withdrawFromCommandCentre();
         }
     }
 }

@@ -51,8 +51,8 @@ package au.com.brentoncrowley.managers.commands.data {
 
         public function dispose():void {
             _command = null;
-            if(_nextCommandData) _nextCommandData.dispose();
-            if(_previousCommandData) _previousCommandData.dispose();
+            if(_nextCommandData) _nextCommandData = null;
+            if(_previousCommandData) _previousCommandData = null;
             if(_previousCommand) _previousCommand = null;
         }
     }

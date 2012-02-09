@@ -13,14 +13,26 @@ package au.com.brentoncrowley.managers.commands.data {
 
     public class CommandSlotData {
 
+        private static var idCounter:uint = 0;
+
         private var _commandData:CommandData;
         private var _object:ICommandObject;
+        private var _history:Vector.<CommandData>;
+        private var _id:String;
+        private var _commandList:CommandListData;
 //        private var _commandHistory:Vector.<CommandData>;
 
         public function CommandSlotData(object:ICommandObject, defaultCommandData:CommandData = null) {
             _object = object;
             _commandData = defaultCommandData ? defaultCommandData : new CommandData(new NoCommand());
+            _id = String(object) + idCounter;
+            clearHistory();
+            idCounter++;
 //            _commandHistory = new Vector.<CommandData>();
+        }
+
+        public function clearHistory():void {
+            _history = new Vector.<CommandData>();
         }
 
         public function get commandData():CommandData {
@@ -53,6 +65,30 @@ package au.com.brentoncrowley.managers.commands.data {
 
         public function get object():ICommandObject {
             return _object;
+        }
+
+        public function get history():Vector.<CommandData> {
+            return _history;
+        }
+
+        public function addCommandToHistory():void {
+            _history.unshift(commandData);
+        }
+
+        public function getLastHistoryCommand():CommandData {
+            return _history.shift();
+        }
+
+        public function get id():String {
+            return _id;
+        }
+
+        public function set commandList(commandList:CommandListData):void {
+            _commandList = commandList;
+        }
+
+        public function get commandList():CommandListData {
+            return _commandList;
         }
     }
 }

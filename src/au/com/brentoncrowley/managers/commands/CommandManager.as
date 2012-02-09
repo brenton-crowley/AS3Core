@@ -56,6 +56,12 @@ package au.com.brentoncrowley.managers.commands {
             commandLists = new Dictionary();
         }
 
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+        //------------------------------ METHODS FOR COMMAND SLOTS
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+
         public function registerSlot(object:ICommandObject, defaultCommand:ICommand = null):void {
             var commandData:CommandData = new CommandData(defaultCommand ? defaultCommand : new NoCommand());
             var commandSlotData:CommandSlotData = new CommandSlotData(object);
@@ -63,11 +69,21 @@ package au.com.brentoncrowley.managers.commands {
             commandSlots[object] = commandSlotData;
         }
 
-        public function unregisterSlot(object:ICommandObject):void {
-            var commandSlotData:CommandSlotData = commandSlots[object];
-            commandSlotData.dispose();
-            commandSlotData = null;
-            commandSlots[object = null];
+        public function withdrawSlot(object:ICommandObject):void {
+            try{
+                var commandSlotData:CommandSlotData = commandSlots[object];
+                clearHistoryReferences(commandSlotData);
+                commandSlotData.dispose();
+                commandSlotData = null;
+                delete commandSlots[object];
+            }catch (error:Error){}
+        }
+
+        private function clearHistoryReferences(commandSlotData:CommandSlotData):void {
+            var index:uint = _slotHistory.indexOf(commandSlotData);
+            while(_slotHistory.indexOf(commandSlotData) != -1){
+                _slotHistory.splice(index, 1);
+            }
         }
 
         public function setCommandInSlot(object:ICommandObject, command:ICommand):void {
@@ -88,87 +104,101 @@ package au.com.brentoncrowley.managers.commands {
         }
 
         public function undoSlotCommand(object:ICommandObject):void {
-            var commandSlotData:CommandSlotData = commandSlots[object];
-//            removeFromHistory(commandSlotData);
-            undo(commandSlotData.commandData);
-        }
+            try {
+                var commandSlotData:CommandSlotData = commandSlots[object];
+                var lastCommandDataInHistory:CommandData = commandSlotData.getLastHistoryCommand();
+                // TODO Maybe some notification that there are no more steps to undo.
+                if(lastCommandDataInHistory){
+                    setCommandInSlot(object, lastCommandDataInHistory.command);
+                    removeFromHistory(commandSlotData);
+                    undo(commandSlotData.commandData);
 
-        private function removeFromHistory(commandSlotData:CommandSlotData):void {
-            if(slotHistory.length == 0) return;
-            var index:Number = 0;
-            while(index != slotHistory.length - 1){
-                var comparitiveCommandSlotData:CommandSlotData = slotHistory[index];
-                if(comparitiveCommandSlotData == commandSlotData){
-                    trace("LENGTH BEFORE SPLICE:", slotHistory.length);
-                    slotHistory.splice(index, 1);
-                    trace("LENGTH AFTER SPLICE:", slotHistory.length);
-                    trace("*********************************** REMOVED FROM HISTORY", commandSlotData.commandData.command, comparitiveCommandSlotData.commandData.command);
-                    break;
                 }
-                index++;
 
-            }
+            }catch (error:Error){}
         }
 
-        public function globalUndo():void {
-            var undoCommandSlotData:CommandSlotData = getUndoCommandSlotData();
-            var commandSlot:CommandSlot = undoCommandSlotData.object as CommandSlot;
-            commandSlot ? commandSlot.undo() : undo(undoCommandSlotData.commandData);
-            trace(this, "********************************** SLOT HISTORY:", _slotHistory);
-        }
-
-        public function clearSlotHistory():void {
-            _slotHistory = [];
-        }
-
-        private function updateSlotHistory(commandSlotData:CommandSlotData):void {
-            _slotHistory.unshift(commandSlotData);
-            trace(this, "********************************** SLOT HISTORY:", _slotHistory);
-        }
-
-        private function getUndoCommandSlotData():CommandSlotData {
-            trace("########### getUndoCommandSlotData");
-            var commandSlotData:CommandSlotData = _slotHistory.shift();
-            commandSlotData = commandSlotData ? commandSlotData : new CommandSlotData(null), new CommandData(new GlobalUndoCompleteCommand());
-            return commandSlotData;
-        }
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+        //------------------------------ METHODS FOR COMMAND LISTS
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
 
         public function registerList(object:ICommandObject, commandList:Array):void {
+            registerSlot(object);
             commandList = commandList ? commandList : [new NoCommand()];
-            var commandListData:CommandListData = new CommandListData(object, commandList);
+            var commandListData:CommandListData = new CommandListData(object, commandList, commandSlots[object]);
             commandLists[object] = commandListData;
-
             trace(this, " COMMAND LIST REGISTERED - ***OBJECT***:", object, "***COMMANDS***", commandList);
         }
 
-        public function unregisterList(object:ICommandObject):void {
-            var commandListData:CommandListData= commandLists[object];
-            commandListData.dispose();
-            commandListData = null;
-            commandLists[object = null];
+        public function withdrawList(object:ICommandObject):void {
+            try{
+                var commandListData:CommandListData= commandLists[object];
+                withdrawSlot(object);
+                commandListData.dispose();
+                commandListData = null;
+                delete commandLists[object];
+            }catch (error:Error){}
         }
 
         public function startListCommandSequence(object:ICommandObject):void {
             trace("------------- > [START COMMAND SEQUENCE]:", object);
             var commandListData:CommandListData = commandLists[object];
-            commandListData.setToFirstCommand();
-            executeListCommand(object);
+            setCommandInSlot(object, commandListData.startCommand().command);
+            executeSlotCommand(object);
         }
 
         public function executeListCommand(object:ICommandObject):void {
-            var commandListData:CommandListData = commandLists[object];
-            var commandDataToExecute:CommandData = commandListData.commandSlotData.commandData;
-            commandListData.setNextCommandData();
-            execute(commandDataToExecute);
-
+            try{
+                var commandListData:CommandListData = commandLists[object];
+                setCommandInSlot(object, commandListData.nextCommand().command);
+                executeSlotCommand(object);
+            }catch (error:Error){}
         }
 
         public function undoListCommand(object:ICommandObject):void {
-            var commandListData:CommandListData = commandLists[object];
-            var commandDataToExecute:CommandData = commandListData.commandSlotData.commandData;
-            commandListData.setPreviousCommandData();
-            undo(commandDataToExecute);
+            try{
+                undoSlotCommand(object);
+                var commandListData:CommandListData = commandLists[object];
+                commandListData.previousCommand();
+            }catch (error:Error){}
 
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+        //------------------------------ SHARED METHODS
+        //--------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------
+
+        public function globalUndo():void {
+            var commandSlotData:CommandSlotData = _slotHistory[0];
+            // TODO Maybe some notification that there are no more steps to undo.
+            if(commandSlotData){
+                if(commandSlotData.commandList == null) undoSlotCommand(commandSlotData.object);
+                else undoListCommand(commandSlotData.object);
+            }
+        }
+
+        private function updateSlotHistory(commandSlotData:CommandSlotData):void {
+            _slotHistory.unshift(commandSlotData);
+            commandSlotData.addCommandToHistory();
+        }
+
+        private function removeFromHistory(commandSlotData:CommandSlotData):void {
+            if(slotHistory.length == 0) return;
+            var index:uint = _slotHistory.indexOf(commandSlotData);
+            _slotHistory.splice(index, 1);
+
+        }
+
+        public function clearGlobalSlotHistory():void {
+            _slotHistory = [];
+        }
+
+        public function get slotHistory():Array {
+            return _slotHistory;
         }
 
         private function execute(commandData:CommandData):void {
@@ -187,10 +217,6 @@ package au.com.brentoncrowley.managers.commands {
             } catch(error:Error) {
                 trace("ERROR - undoCommandSlot:", error.getStackTrace());
             }
-        }
-
-        public function get slotHistory():Array {
-            return _slotHistory;
         }
     }
 }

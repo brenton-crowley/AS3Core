@@ -12,6 +12,8 @@ package com.example.commands {
     import au.com.brentoncrowley.ui.buttons.ClickTargetButton;
     import au.com.brentoncrowley.ui.display.AbstractMain;
 
+    import com.example.clicktargets.ClearObjectTarget;
+
     import com.example.clicktargets.ExecuteListCommandTarget;
     import com.example.clicktargets.UndoListCommandTarget;
     import com.example.slots.Remote;
@@ -20,10 +22,9 @@ package com.example.commands {
 
         public var undoButton:ClickTargetButton;
         public var executeButton:ClickTargetButton;
+        public var clearObjectButton:ClickTargetButton;
 
         public var remote:Remote;
-
-        private var commandList:CommandList;
 
         public function CommandExample() {
             super();
@@ -32,22 +33,14 @@ package com.example.commands {
         override protected function init():void {
             super.init();
             
-            createCommandList();
+            initButton(undoButton, new UndoListCommandTarget(remote.commandList));
+            initButton(executeButton, new ExecuteListCommandTarget(remote.commandList));
+            initButton(clearObjectButton, new ClearObjectTarget(remote.commandList));
 
-            initButton(undoButton, new UndoListCommandTarget(commandList));
-            initButton(executeButton, new ExecuteListCommandTarget(commandList));
+            clearObjectButton.visible = false;
         }
 
-        private function createCommandList():void {
-            commandList = new CommandList();
-            var commandSequence:Array = [
-                new FirstCommand(commandList),
-                new SecondCommand(commandList)
-            ];
-            commandList.commandSequence = commandSequence;
-            commandList.registerWithCommandCentre();
 
-        }
 
         private function initButton(button:ClickTargetButton, clickTarget:IClickTarget):void {
             button.clickTarget = clickTarget;

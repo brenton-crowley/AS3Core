@@ -8,6 +8,7 @@
 package com.example.slots {
 
     import au.com.brentoncrowley.interfaces.IClickTarget;
+    import au.com.brentoncrowley.managers.commands.CommandList;
     import au.com.brentoncrowley.managers.commands.CommandSlot;
     import au.com.brentoncrowley.ui.buttons.ClickTargetButton;
 
@@ -33,11 +34,14 @@ package com.example.slots {
         public var masterUndoButton:ClickTargetButton;
 
         private var commandSlot:CommandSlot;
+        private var _commandList:CommandList;
 
         public function Remote() {
 
             commandSlot = new CommandSlot();
-
+            commandSlot.setCommand(new MasterOffCommand([new TurnOffCommand(slot1.light), new TurnOffCommand(slot2.light), new TurnOffCommand(slot3.light)]));
+            commandSlot.execute();
+            createCommandList();
             initButtons()
         }
 
@@ -50,6 +54,31 @@ package com.example.slots {
         private function initButton(button:ClickTargetButton, clickTarget:IClickTarget):void {
             button.clickTarget = clickTarget;
             button.initButton();
+        }
+
+        private function createCommandList():void {
+            _commandList = new CommandList();
+            var commandSequence:Array = [
+                    new TurnOnCommand(slot1.light),
+                    new TurnOnCommand(slot2.light),
+                    new TurnOnCommand(slot3.light),
+                    new MasterOffCommand([new TurnOffCommand(slot1.light), new TurnOffCommand(slot2.light), new TurnOffCommand(slot3.light)]),
+                    new TurnOnCommand(slot3.light),
+                    new TurnOnCommand(slot2.light),
+                    new TurnOffCommand(slot3.light),
+                    new TurnOffCommand(slot2.light),
+                    new MasterOnCommand([new TurnOnCommand(slot1.light), new TurnOnCommand(slot2.light), new TurnOnCommand(slot3.light)]),
+                    new MasterOffCommand([new TurnOffCommand(slot1.light), new TurnOffCommand(slot2.light), new TurnOffCommand(slot3.light)])
+
+
+            ];
+            commandList.commandSequence = commandSequence;
+            commandList.registerWithCommandCentre();
+
+        }
+
+        public function get commandList():CommandList {
+            return _commandList;
         }
     }
 }

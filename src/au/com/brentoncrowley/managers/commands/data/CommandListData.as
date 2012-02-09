@@ -9,6 +9,7 @@ package au.com.brentoncrowley.managers.commands.data {
 
     import au.com.brentoncrowley.interfaces.ICommand;
     import au.com.brentoncrowley.interfaces.ICommandObject;
+    import au.com.brentoncrowley.managers.commands.CommandSlot;
     import au.com.brentoncrowley.managers.commands.cmds.SequenceCompletedCommand;
     import au.com.brentoncrowley.managers.commands.cmds.SequenceStartCommand;
 
@@ -17,20 +18,16 @@ package au.com.brentoncrowley.managers.commands.data {
         private var _commandSlotData:CommandSlotData;
         private var _commandDatas:Array;
         private var _object:ICommandObject;
+        private var _commandList:Array;
+        private var _currentCommandData:CommandData;
 
-        public function CommandListData(object:ICommandObject, commandList:Array) {
+        public function CommandListData(object:ICommandObject, commandList:Array, commandSlotData:CommandSlotData) {
             _object = object;
-            _commandSlotData = new CommandSlotData(_object);
+            _commandList = commandList;
+            _commandSlotData = commandSlotData;
+            _commandSlotData.commandList = this;
             _commandDatas = [];
             generateCommandListData(commandList);
-            _commandSlotData.commandData = _commandDatas[0];
-        }
-
-
-        public function setToFirstCommand():void {
-            if(_commandDatas){
-                _commandSlotData.commandData = _commandDatas[0];
-            }
         }
 
         private function generateCommandListData(commandList:Array):void {
@@ -39,7 +36,7 @@ package au.com.brentoncrowley.managers.commands.data {
             var previousCommandData:CommandData;
 
             for (var i:int = 0; i < commandList.length; i++) {
-                
+
 
                 var command:ICommand = commandList[i];
                 var commandData:CommandData = new CommandData(command);
@@ -52,21 +49,23 @@ package au.com.brentoncrowley.managers.commands.data {
                 previousCommandData = commandData;
             }
 
+            _currentCommandData =  _commandDatas[0];
         }
 
-        public function setNextCommandData():void {
-            var nextCommandData:CommandData = _commandSlotData.commandData.nextCommandData;
-            _commandSlotData.commandData = nextCommandData ? nextCommandData : _commandSlotData.commandData;
+        public function startCommand():CommandData {
+            _currentCommandData = _commandDatas[0];
+            return _currentCommandData;
         }
 
-        public function setPreviousCommandData():void {
-            var previousCommandData:CommandData = _commandSlotData.commandData.previousCommandData;
-            _commandSlotData.commandData = _commandSlotData.commandData = previousCommandData ? previousCommandData : _commandSlotData.commandData;
-
+        public function nextCommand():CommandData {
+            var nextCommandData:CommandData = _currentCommandData.nextCommandData;
+            _currentCommandData = nextCommandData ? nextCommandData : _currentCommandData;
+            return _currentCommandData;
         }
 
-        public function get commandSlotData():CommandSlotData {
-            return _commandSlotData;
+        public function previousCommand():void {
+            var previousCommandData:CommandData = _currentCommandData.previousCommandData;
+            _currentCommandData = previousCommandData ? previousCommandData : _currentCommandData;
         }
 
         public function dispose():void {
@@ -74,7 +73,6 @@ package au.com.brentoncrowley.managers.commands.data {
                 _commandSlotData.dispose();
                 _commandSlotData = null
             }
-
             if(_commandDatas){
                 while(_commandDatas.length != 0){
                     var commandData:CommandData = _commandDatas.shift();
@@ -83,10 +81,16 @@ package au.com.brentoncrowley.managers.commands.data {
                 }
                 _commandDatas = null;
             }
+
+            _object = null;
+            _currentCommandData = null;
+            _commandList = null;
         }
 
         public function get object():ICommandObject {
             return _object;
         }
+
+
     }
 }
